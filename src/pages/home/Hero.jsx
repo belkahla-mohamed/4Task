@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { CheckCircle, Zap, ArrowRight, Play, Wifi, WifiOff } from "lucide-react"
+import { CheckCircle, Zap, ArrowRight, Play, Wifi, WifiOff, Shield } from "lucide-react"
 
 // Custom Button component
 const Button = ({ children, size, variant = "default", className = "", asChild, ...props }) => {
@@ -224,7 +224,7 @@ export default function Hero() {
 
                 <h1 className="text-5xl lg:text-6xl font-bold text-gray-800 leading-tight">
                   Stay Productive
-                  <span className="block text-blue-600 bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-transparent">
+                  <span className="block  bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-transparent">
                     Anywhere, Anytime
                   </span>
                 </h1>
@@ -238,7 +238,7 @@ export default function Hero() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   size="lg"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 hover:-translate-y-1"
+                  className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 hover:-translate-y-1"
                 >
                   Start Managing Tasks
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -247,7 +247,7 @@ export default function Hero() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-gray-300 px-8 py-4 text-lg bg-white/80 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+                  className="cursor-pointer border-gray-300 px-8 py-4 text-lg bg-white/80 backdrop-blur-sm shadow-md text-black hover:text-black hover:bg-white hover:shadow-lg transition-all duration-200 hover:scale-105"
                 >
                   <Play className="mr-2 h-5 w-5" />
                   Watch Demo
@@ -262,16 +262,22 @@ export default function Hero() {
                   <div className="text-sm text-gray-600">Offline Ready</div>
                 </div>
                 <div className="text-center group">
-                  <div className="text-2xl font-bold text-gray-800 group-hover:scale-110 transition-transform duration-200">
-                    ⚡
+                  <div className="relative">
+                    <div className="text-2xl font-bold text-gray-800 group-hover:scale-110 transition-all duration-300 flex items-center justify-center w-12 h-12 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-full group-hover:from-yellow-200 group-hover:to-orange-200 group-hover:shadow-lg">
+                      <Zap className="h-6 w-6 text-yellow-600 group-hover:text-yellow-700 animate-pulse group-hover:animate-bounce" />
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300 animate-ping"></div>
                   </div>
-                  <div className="text-sm text-gray-600">Lightning Fast</div>
+                  <div className="text-sm text-gray-600 mt-2">Fast</div>
                 </div>
                 <div className="text-center group">
-                  <div className="text-2xl font-bold text-gray-800 group-hover:scale-110 transition-transform duration-200">
-                    🔒
+                  <div className="relative">
+                    <div className="text-2xl font-bold text-gray-800 group-hover:scale-110 transition-all duration-300 flex items-center justify-center w-12 h-12 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full group-hover:from-green-200 group-hover:to-emerald-200 group-hover:shadow-lg">
+                      <Shield className="h-6 w-6 text-green-600 group-hover:text-green-700 group-hover:animate-pulse" />
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-400 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300 animate-ping"></div>
                   </div>
-                  <div className="text-sm text-gray-600">Secure</div>
+                  <div className="text-sm text-gray-600 mt-2">Secure</div>
                 </div>
               </div>
             </div>
@@ -294,7 +300,6 @@ export default function Hero() {
                           ${taskAnimations[1] && index === 1 ? "task-fly-right" : ""}
                           ${taskAnimations[2] && index === 2 ? "task-fly-top" : ""}
                           ${!taskAnimations[index] ? "opacity-0" : ""}
-                          ${task.status === "completed" ? "opacity-50" : ""}
                         `}
                       >
                         {task.status === "completed" ? (
