@@ -3,6 +3,8 @@ import Dashboard from './pages/dashboard/page'
 import { TranslationProvider } from '@/components/translation-provider'
 import "./App.css"
 import Home from './pages/Home'
+import Login from './pages/Auth/Login'
+import Register from './pages/Auth/Register'
 
 function App() {
   return (
@@ -10,6 +12,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
