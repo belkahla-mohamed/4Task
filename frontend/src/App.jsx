@@ -5,6 +5,8 @@ import "./App.css"
 import Home from './pages/Home'
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
+import Profile from './pages/Auth/Profile'
+import Achievements from './pages/Achievement'
 
 function App() {
   return (
@@ -14,7 +16,9 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/achievement" element={<Achievements />} />
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
       </BrowserRouter>

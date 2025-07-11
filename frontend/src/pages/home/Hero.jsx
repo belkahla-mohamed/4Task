@@ -74,7 +74,7 @@ export default function Hero() {
 
   return (
     <>
-      <style jsx>{`
+      <style>{`
         @keyframes flyInLeft {
           0% {
             transform: translateX(-100vw) rotate(-10deg);

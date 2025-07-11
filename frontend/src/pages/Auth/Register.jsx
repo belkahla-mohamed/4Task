@@ -335,21 +335,27 @@ export default function Register() {
     setErrors({})
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 3000))
-
-      // Mock successful registration
-      const userData = {
-        name: formData.username,
-        email: formData.email,
+      // Strapi register API call
+      const response = await fetch('https://fresh-egg-85913f543b.strapiapp.com/api/auth/local/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        }),
+      })
+      const data = await response.json()
+      if (!response.ok) {
+        setErrors({ general: data.error?.message || 'Registration failed' })
+        setIsLoading(false)
+        return
       }
-
-      localStorage.setItem("authToken", "dummy-token")
-      localStorage.setItem("userData", JSON.stringify(userData))
-
-      navigate("/dashboard")
+      // Save only JWT
+      localStorage.setItem('authToken', data.jwt)
+      navigate('/login')
     } catch (err) {
-      setErrors({ general: "An error occurred while creating your account" })
+      setErrors({ general: 'Unable to connect to server' })
     } finally {
       setIsLoading(false)
     }

@@ -234,21 +234,26 @@ export default function Login() {
     setErrors({})
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      // Mock successful login
-      const userData = {
-        name: "John Doe",
-        email: formData.email,
+      // Strapi login API call
+      const response = await fetch('https://fresh-egg-85913f543b.strapiapp.com/api/auth/local', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          identifier: formData.email,
+          password: formData.password,
+        }),
+      })
+      const data = await response.json()
+      if (!response.ok) {
+        setErrors({ general: data.error?.message || 'Invalid email or password' })
+        setIsLoading(false)
+        return
       }
-
-      localStorage.setItem("authToken", "dummy-token")
-      localStorage.setItem("userData", JSON.stringify(userData))
-
-      navigate("/dashboard")
+      // Save only JWT
+      localStorage.setItem('authToken', data.jwt)
+      navigate('/dashboard')
     } catch (err) {
-      setErrors({ general: "Invalid email or password" })
+      setErrors({ general: 'Unable to connect to server' })
     } finally {
       setIsLoading(false)
     }
