@@ -2,7 +2,7 @@
 
 import { Link } from "react-router-dom"
 import { useTranslation } from "@/components/translation-provider"
-import { LogIn, User, X } from "lucide-react"
+import { LogIn, User, X, Moon, Sun } from "lucide-react"
 import { useState, useEffect } from "react"
 import { jwtDecode } from "jwt-decode"
 
@@ -187,11 +187,19 @@ const useAuth = () => {
   return { isLoggedIn, user, login, logout }
 }
 
+// Dark mode toggle function
+const toggleDarkMode = () => {
+  const html = document.documentElement
+  html.classList.toggle("dark")
+}
+
 export default function Header() {
   const { t } = useTranslation()
   const { isLoggedIn, user, logout } = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark"))
+  const [mood, setMood] = useState(() => document.documentElement.classList.contains('dark') ? 'dark' : 'light')
 
   // Handle scroll effect
   useEffect(() => {
@@ -200,6 +208,14 @@ export default function Header() {
     }
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setMood(document.documentElement.classList.contains('dark') ? 'dark' : 'light')
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
   }, [])
 
   const handleLogin = () => {
@@ -215,11 +231,23 @@ export default function Header() {
     setIsMobileMenuOpen(!isMobileMenuOpen)
   }
 
+  const handleToggleDark = () => {
+    toggleDarkMode()
+    setIsDark(document.documentElement.classList.contains("dark"))
+  }
+
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-40 bg-white transition-all duration-300 ${isScrolled ? "shadow-lg border-b border-gray-100" : "shadow-sm"
-          }`}
+        style={{
+          background: 'var(--color-background)',
+          color: 'var(--color-foreground)',
+          borderBottom: isScrolled ? '1px solid var(--color-border)' : undefined,
+          boxShadow: isScrolled ? '0 2px 8px 0 rgba(0,0,0,0.06)' : '0 1px 2px 0 rgba(0,0,0,0.03)',
+          transition: 'all 0.3s',
+        }}
+        className={`fixed top-0 left-0 right-0 z-40`}
+        data-mood={mood}
       >
         <div className="container mx-auto px-4 lg:px-6">
           <div className="flex justify-between items-center h-16 lg:h-20">
@@ -228,17 +256,16 @@ export default function Header() {
               <div className="relative">
                 {/* Logo container with enhanced styling */}
                 <div className="flex items-center justify-center rounded-2xl shadow-xl group-hover:shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 relative overflow-hidden">
-           
 
                   {/* Logo image */}
                   <img
                     src="https://fresh-egg-85913f543b.media.strapiapp.com/logo_4task_a2d3384540.png"
                     alt="4Task Logo"
-                    className="h-8 w-8 lg:h-12 lg:w-12 object-contain relative z-10 drop-shadow-lg filter brightness-110 contrast-110 group-hover:brightness-125 transition-all duration-300"
+                    className="h-8 w-8 lg:h-12 lg:w-12 object-contain relative z-10 drop-shadow-lg"
                     style={{
                       minWidth: "2rem",
                       minHeight: "2rem",
-                      
+                     filter: 'brightness(1.1) contrast(1.1)',
                     }}
                   />
 
@@ -253,10 +280,20 @@ export default function Header() {
 
               {/* Brand text with enhanced typography */}
               <div className="flex flex-col">
-                <h1 className="text-xl lg:text-2xl font-black bg-gradient-to-r from-gray-800 via-gray-900 to-black bg-clip-text text-transparent tracking-tight leading-none group-hover:from-blue-600 group-hover:via-blue-700 group-hover:to-blue-800 transition-all duration-500">
+                <h1
+                  className="text-xl lg:text-2xl font-black bg-clip-text text-transparent tracking-tight leading-none transition-all duration-500"
+                  style={{
+                    background: 'linear-gradient(90deg, var(--color-foreground), var(--color-foreground), var(--color-foreground))',
+                    WebkitBackgroundClip: 'text',
+                    color: 'transparent',
+                  }}
+                >
                   4Task
                 </h1>
-                <span className="text-xs lg:text-sm font-medium text-gray-500 group-hover:text-blue-500 transition-colors duration-300 tracking-wide">
+                <span
+                  className="text-xs lg:text-sm font-medium transition-colors duration-300 tracking-wide"
+                  style={{ color: 'var(--color-muted-foreground)' }}
+                >
                   Task Manager
                 </span>
               </div>
@@ -289,6 +326,15 @@ export default function Header() {
 
             {/* Desktop Controls */}
             <div className="hidden lg:flex items-center space-x-4">
+              {/* Dark mode toggle button */}
+              <button
+                onClick={handleToggleDark}
+                className="p-2 rounded-xl transition-colors duration-200"
+                style={{ background: 'var(--color-muted)', color: 'var(--color-foreground)' }}
+                aria-label="Toggle dark mode"
+              >
+                {isDark ? <Sun className="h-5 w-5" style={{ color: '#facc15' }} /> : <Moon className="h-5 w-5" style={{ color: 'var(--color-foreground)' }} />}
+              </button>
               {isLoggedIn ? (
                 <div className="flex items-center space-x-3">
                   {user && (
@@ -324,9 +370,19 @@ export default function Header() {
             </div>
 
             {/* Mobile Menu Button */}
+            <div className="flex lg:hidden items-center space-x-2">
+              {/* Dark mode toggle button (mobile) */}
+              <button
+                onClick={handleToggleDark}
+                className="p-2 rounded-xl transition-colors duration-200"
+                style={{ background: 'var(--color-muted)', color: 'var(--color-foreground)' }}
+                aria-label="Toggle dark mode"
+              >
+                {isDark ? <Sun className="h-5 w-5" style={{ color: '#facc15' }} /> : <Moon className="h-5 w-5" style={{ color: 'var(--color-foreground)' }} />}
+              </button>
             <button
               onClick={toggleMobileMenu}
-              className="lg:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200 relative"
+                className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200 relative"
             >
               <div className="relative w-6 h-6">
                 <span
@@ -343,6 +399,7 @@ export default function Header() {
                 ></span>
               </div>
             </button>
+            </div>
           </div>
         </div>
       </header>

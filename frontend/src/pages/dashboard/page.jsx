@@ -19,42 +19,105 @@ import {
   MoreVertical,
 } from "lucide-react"
 
-// Mock data for tasks
-const initialTasks = [
-  {
-    id: 1,
-    title: "Complete project proposal",
-    description: "Finish the quarterly project proposal for the marketing team",
-    dueDate: "2024-01-15",
-    status: "pending",
-    category: "Work",
-    priority: "high",
-    syncStatus: "synced",
-    createdAt: "2024-01-10",
-  },
-  {
-    id: 2,
-    title: "Buy groceries",
-    description: "Get milk, bread, eggs, and vegetables for the week",
-    dueDate: "2024-01-12",
-    status: "in-progress",
-    category: "Personal",
-    priority: "medium",
-    syncStatus: "pending",
-    createdAt: "2024-01-09",
-  },
-  {
-    id: 3,
-    title: "Review code changes",
-    description: "Review pull requests from the development team",
-    dueDate: "2024-01-11",
-    status: "done",
-    category: "Work",
-    priority: "high",
-    syncStatus: "synced",
-    createdAt: "2024-01-08",
-  },
-]
+// --- Strapi API utility functions ---
+const STRAPI_URL = "https://fresh-egg-85913f543b.strapiapp.com";
+
+async function fetchTasks() {
+  try {
+    const res = await fetch(`${STRAPI_URL}/api/tasks?populate=category`, { cache: "no-store" });
+    const data = await res.json();
+    console.log('Tasks API response:', data); // Debug log
+    
+    if (data.data && Array.isArray(data.data)) {
+      return data.data.map((item) => ({
+        id: item.id,
+        title: item.attributes?.title || item.title || 'Untitled Task',
+        description: item.attributes?.description || item.description || '',
+        dueDate: item.attributes?.dueDate || item.dueDate || '',
+        status: item.attributes?.statusTask || item.statusTask || 'pending',
+        category: item.attributes?.category?.data?.id || item.category?.id || null,
+        categoryName: item.attributes?.category?.data?.attributes?.name || 
+                    item.attributes?.category?.data?.name || 
+                    item.category?.name || "",
+        priority: item.attributes?.priority || item.priority || 'medium',
+        syncStatus: item.attributes?.isSynced ? "synced" : "pending",
+        createdAt: item.attributes?.createdAt || item.createdAt || new Date().toISOString(),
+      }));
+    } else {
+      console.warn('Unexpected tasks response structure:', data);
+      return [];
+    }
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    return [];
+  }
+}
+
+async function fetchCategories() {
+  try {
+    const res = await fetch(`${STRAPI_URL}/api/categories`);
+    const data = await res.json();
+    console.log('Categories API response:', data); // Debug log
+    
+    // Based on the actual API response structure
+    if (data.data && Array.isArray(data.data)) {
+      return data.data.map((item) => ({
+        id: item.id,
+        name: item.name,
+      }));
+    } else {
+      console.warn('Unexpected categories response structure:', data);
+      return [];
+    }
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+}
+
+async function addTaskToStrapi(task) {
+  const res = await fetch(`${STRAPI_URL}/api/tasks`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      data: {
+        title: task.title,
+        description: task.description,
+        dueDate: task.dueDate,
+        statusTask: task.status,
+        priority: task.priority,
+        category: task.category,
+        isSynced: true,
+      },
+    }),
+  });
+  const data = await res.json();
+  return data.data;
+}
+
+async function updateTaskInStrapi(id, task) {
+  const res = await fetch(`${STRAPI_URL}/api/tasks/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      data: {
+        title: task.title,
+        description: task.description,
+        dueDate: task.dueDate,
+        statusTask: task.status,
+        priority: task.priority,
+        category: task.category,
+        isSynced: true,
+      },
+    }),
+  });
+  const data = await res.json();
+  return data.data;
+}
+
+async function deleteTaskFromStrapi(id) {
+  await fetch(`${STRAPI_URL}/api/tasks/${id}`, { method: "DELETE" });
+}
 
 // Floating background elements
 const FloatingElements = () => {
@@ -157,7 +220,7 @@ const TaskCard = ({ task, onEdit, onDelete, onStatusChange }) => {
                   color: "#1E90FF",
                 }}
               >
-                {task.category}
+                {task.categoryName}
               </span>
             </div>
           </div>
@@ -207,38 +270,38 @@ const TaskCard = ({ task, onEdit, onDelete, onStatusChange }) => {
 }
 
 // Add/Edit Task Modal
-const TaskModal = ({ isOpen, onClose, task, onSave }) => {
+const TaskModal = ({ isOpen, onClose, task, onSave, categories }) => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     dueDate: "",
     status: "pending",
-    category: "Personal",
+    category: "",
     priority: "medium",
-  })
+  });
 
   useEffect(() => {
     if (task) {
-      setFormData(task)
+      setFormData(task);
     } else {
       setFormData({
         title: "",
         description: "",
         dueDate: "",
         status: "pending",
-        category: "Personal",
+        category: categories[0]?.id || "",
         priority: "medium",
-      })
+      });
     }
-  }, [task, isOpen])
+  }, [task, isOpen, categories]);
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    onSave(formData)
-    onClose()
-  }
+    e.preventDefault();
+    onSave(formData);
+    onClose();
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -248,7 +311,6 @@ const TaskModal = ({ isOpen, onClose, task, onSave }) => {
         style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
         onClick={onClose}
       />
-
       {/* Modal */}
       <div
         className="relative w-full max-w-md mx-4 p-6 rounded-3xl shadow-2xl border transform animate-modal-in"
@@ -260,7 +322,6 @@ const TaskModal = ({ isOpen, onClose, task, onSave }) => {
         <h2 className="text-2xl font-bold mb-6" style={{ color: "#E0E0E0" }}>
           {task ? "Edit Task" : "Add New Task"}
         </h2>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Title */}
           <div>
@@ -281,7 +342,6 @@ const TaskModal = ({ isOpen, onClose, task, onSave }) => {
               placeholder="Enter task title"
             />
           </div>
-
           {/* Description */}
           <div>
             <label className="block text-sm font-medium mb-2" style={{ color: "#B0B0B0" }}>
@@ -300,7 +360,6 @@ const TaskModal = ({ isOpen, onClose, task, onSave }) => {
               placeholder="Enter task description"
             />
           </div>
-
           {/* Due Date */}
           <div>
             <label className="block text-sm font-medium mb-2" style={{ color: "#B0B0B0" }}>
@@ -318,7 +377,6 @@ const TaskModal = ({ isOpen, onClose, task, onSave }) => {
               }}
             />
           </div>
-
           {/* Category and Priority */}
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -335,13 +393,11 @@ const TaskModal = ({ isOpen, onClose, task, onSave }) => {
                   color: "#E0E0E0",
                 }}
               >
-                <option value="Personal">Personal</option>
-                <option value="Work">Work</option>
-                <option value="Health">Health</option>
-                <option value="Education">Education</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
               </select>
             </div>
-
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: "#B0B0B0" }}>
                 Priority
@@ -362,7 +418,6 @@ const TaskModal = ({ isOpen, onClose, task, onSave }) => {
               </select>
             </div>
           </div>
-
           {/* Status (only for edit) */}
           {task && (
             <div>
@@ -380,12 +435,11 @@ const TaskModal = ({ isOpen, onClose, task, onSave }) => {
                 }}
               >
                 <option value="pending">Pending</option>
-                <option value="in-progress">In Progress</option>
+                <option value="in_progress">In Progress</option>
                 <option value="done">Done</option>
               </select>
             </div>
           )}
-
           {/* Buttons */}
           <div className="flex space-x-3 pt-4">
             <button
@@ -413,20 +467,40 @@ const TaskModal = ({ isOpen, onClose, task, onSave }) => {
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
 // Main Dashboard Component
 export default function Dashboard() {
-  const [tasks, setTasks] = useState(initialTasks)
-  const [filteredTasks, setFilteredTasks] = useState(initialTasks)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [categoryFilter, setCategoryFilter] = useState("all")
-  const [priorityFilter, setPriorityFilter] = useState("all")
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingTask, setEditingTask] = useState(null)
-  const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const [tasks, setTasks] = useState([]);
+  const [filteredTasks, setFilteredTasks] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [priorityFilter, setPriorityFilter] = useState("all");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch tasks and categories from Strapi
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      try {
+        const [tasksData, categoriesData] = await Promise.all([
+          fetchTasks(),
+          fetchCategories(),
+        ]);
+        setTasks(tasksData);
+        setCategories(categoriesData);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   // Monitor online status
   useEffect(() => {
@@ -444,67 +518,64 @@ export default function Dashboard() {
 
   // Filter tasks
   useEffect(() => {
-    let filtered = tasks
-
+    let filtered = tasks;
     if (searchTerm) {
       filtered = filtered.filter(
         (task) =>
           task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          task.description.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
+          (task.description || "").toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
-
     if (statusFilter !== "all") {
-      filtered = filtered.filter((task) => task.status === statusFilter)
+      filtered = filtered.filter((task) => task.status === statusFilter);
     }
-
     if (categoryFilter !== "all") {
-      filtered = filtered.filter((task) => task.category === categoryFilter)
+      filtered = filtered.filter((task) => String(task.category) === String(categoryFilter));
     }
-
     if (priorityFilter !== "all") {
-      filtered = filtered.filter((task) => task.priority === priorityFilter)
+      filtered = filtered.filter((task) => task.priority === priorityFilter);
     }
-
-    setFilteredTasks(filtered)
-  }, [tasks, searchTerm, statusFilter, categoryFilter, priorityFilter])
+    setFilteredTasks(filtered);
+  }, [tasks, searchTerm, statusFilter, categoryFilter, priorityFilter]);
 
   const handleAddTask = () => {
-    setEditingTask(null)
-    setIsModalOpen(true)
-  }
+    setEditingTask(null);
+    setIsModalOpen(true);
+  };
 
   const handleEditTask = (task) => {
-    setEditingTask(task)
-    setIsModalOpen(true)
-  }
+    setEditingTask(task);
+    setIsModalOpen(true);
+  };
 
-  const handleSaveTask = (taskData) => {
+  const handleSaveTask = async (taskData) => {
+    setLoading(true);
+    try {
     if (editingTask) {
-      // Update existing task
-      setTasks(
-        tasks.map((task) =>
-          task.id === editingTask.id ? { ...taskData, id: editingTask.id, syncStatus: "pending" } : task,
-        ),
-      )
+        await updateTaskInStrapi(editingTask.id, taskData);
     } else {
-      // Add new task
-      const newTask = {
-        ...taskData,
-        id: Date.now(),
-        syncStatus: "pending",
-        createdAt: new Date().toISOString(),
+        await addTaskToStrapi(taskData);
       }
-      setTasks([...tasks, newTask])
+      const updatedTasks = await fetchTasks();
+      setTasks(updatedTasks);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
-  const handleDeleteTask = (taskId) => {
-    setTasks(tasks.filter((task) => task.id !== taskId))
-  }
+  const handleDeleteTask = async (taskId) => {
+    setLoading(true);
+    try {
+      await deleteTaskFromStrapi(taskId);
+      const updatedTasks = await fetchTasks();
+      setTasks(updatedTasks);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleStatusChange = (taskId, currentStatus) => {
-    const statusOrder = ["pending", "in-progress", "done"]
+    const statusOrder = ["pending", "in_progress", "done"]
     const currentIndex = statusOrder.indexOf(currentStatus)
     const nextStatus = statusOrder[(currentIndex + 1) % statusOrder.length]
 
@@ -514,7 +585,7 @@ export default function Dashboard() {
   const getTaskStats = () => {
     const total = tasks.length
     const completed = tasks.filter((task) => task.status === "done").length
-    const inProgress = tasks.filter((task) => task.status === "in-progress").length
+    const inProgress = tasks.filter((task) => task.status === "in_progress").length
     const pending = tasks.filter((task) => task.status === "pending").length
 
     return { total, completed, inProgress, pending }
@@ -603,6 +674,27 @@ export default function Dashboard() {
           ))}
         </div>
 
+        {/* Debug Categories Display */}
+        {categories.length > 0 && (
+          <div className="mb-4 p-4 rounded-xl border" style={{ backgroundColor: "#1E1E1E", borderColor: "rgba(255, 255, 255, 0.1)" }}>
+            <h3 className="text-sm font-medium mb-2" style={{ color: "#B0B0B0" }}>Available Categories:</h3>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => (
+                <span
+                  key={cat.id}
+                  className="px-3 py-1 rounded-full text-xs"
+                  style={{
+                    backgroundColor: "#1E90FF20",
+                    color: "#1E90FF",
+                  }}
+                >
+                  {cat.name} (ID: {cat.id})
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Controls */}
         <div className="flex flex-col lg:flex-row gap-4 mb-8">
           {/* Search */}
@@ -639,7 +731,7 @@ export default function Dashboard() {
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
-              <option value="in-progress">In Progress</option>
+              <option value="in_progress">In Progress</option>
               <option value="done">Done</option>
             </select>
 
@@ -654,10 +746,9 @@ export default function Dashboard() {
               }}
             >
               <option value="all">All Categories</option>
-              <option value="Personal">Personal</option>
-              <option value="Work">Work</option>
-              <option value="Health">Health</option>
-              <option value="Education">Education</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
             </select>
 
             <select
@@ -737,9 +828,10 @@ export default function Dashboard() {
         onClose={() => setIsModalOpen(false)}
         task={editingTask}
         onSave={handleSaveTask}
+        categories={categories}
       />
 
-      <style jsx>{`
+      <style>{`
         @keyframes fade-in {
           from {
             opacity: 0;
