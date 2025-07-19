@@ -2,7 +2,7 @@
 
 import { Link } from "react-router-dom"
 import { useTranslation } from "@/components/translation-provider"
-import { LogIn, User, X, Moon, Sun } from "lucide-react"
+import { LogIn, User, X } from "lucide-react"
 import { useState, useEffect } from "react"
 import { jwtDecode } from "jwt-decode"
 
@@ -198,8 +198,8 @@ export default function Header() {
   const { isLoggedIn, user, logout } = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark"))
-  const [mood, setMood] = useState(() => document.documentElement.classList.contains('dark') ? 'dark' : 'light')
+  // Removed dark mode support
+  // Removed dark mode observer
 
   // Handle scroll effect
   useEffect(() => {
@@ -208,14 +208,6 @@ export default function Header() {
     }
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setMood(document.documentElement.classList.contains('dark') ? 'dark' : 'light')
-    })
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
   }, [])
 
   const handleLogin = () => {
@@ -231,23 +223,19 @@ export default function Header() {
     setIsMobileMenuOpen(!isMobileMenuOpen)
   }
 
-  const handleToggleDark = () => {
-    toggleDarkMode()
-    setIsDark(document.documentElement.classList.contains("dark"))
-  }
+  // Removed dark mode toggle
 
   return (
     <>
       <header
         style={{
-          background: 'var(--color-background)',
-          color: 'var(--color-foreground)',
-          borderBottom: isScrolled ? '1px solid var(--color-border)' : undefined,
+          background: '#fff',
+          color: '#222',
+          borderBottom: isScrolled ? '1px solid #e5e7eb' : undefined,
           boxShadow: isScrolled ? '0 2px 8px 0 rgba(0,0,0,0.06)' : '0 1px 2px 0 rgba(0,0,0,0.03)',
           transition: 'all 0.3s',
         }}
         className={`fixed top-0 left-0 right-0 z-40`}
-        data-mood={mood}
       >
         <div className="container mx-auto px-4 lg:px-6">
           <div className="flex justify-between items-center h-16 lg:h-20">
@@ -255,13 +243,13 @@ export default function Header() {
             <Link to="/" className="flex items-center space-x-3 group">
               <div className="relative">
                 {/* Logo container with enhanced styling */}
-                <div className="flex items-center justify-center rounded-2xl shadow-xl group-hover:shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 relative overflow-hidden">
+                <div className="flex items-center justify-center rounded-2xl  group-hover:shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 relative overflow-hidden">
 
                   {/* Logo image */}
                   <img
                     src="https://fresh-egg-85913f543b.media.strapiapp.com/logo_4task_a2d3384540.png"
                     alt="4Task Logo"
-                    className="h-8 w-8 lg:h-12 lg:w-12 object-contain relative z-10 drop-shadow-lg"
+                    className="h-8 w-8 lg:h-12 lg:w-12 object-contain relative z-10 "
                     style={{
                       minWidth: "2rem",
                       minHeight: "2rem",
@@ -326,15 +314,6 @@ export default function Header() {
 
             {/* Desktop Controls */}
             <div className="hidden lg:flex items-center space-x-4">
-              {/* Dark mode toggle button */}
-              <button
-                onClick={handleToggleDark}
-                className="p-2 rounded-xl transition-colors duration-200"
-                style={{ background: 'var(--color-muted)', color: 'var(--color-foreground)' }}
-                aria-label="Toggle dark mode"
-              >
-                {isDark ? <Sun className="h-5 w-5" style={{ color: '#facc15' }} /> : <Moon className="h-5 w-5" style={{ color: 'var(--color-foreground)' }} />}
-              </button>
               {isLoggedIn ? (
                 <div className="flex items-center space-x-3">
                   {user && (
@@ -371,15 +350,6 @@ export default function Header() {
 
             {/* Mobile Menu Button */}
             <div className="flex lg:hidden items-center space-x-2">
-              {/* Dark mode toggle button (mobile) */}
-              <button
-                onClick={handleToggleDark}
-                className="p-2 rounded-xl transition-colors duration-200"
-                style={{ background: 'var(--color-muted)', color: 'var(--color-foreground)' }}
-                aria-label="Toggle dark mode"
-              >
-                {isDark ? <Sun className="h-5 w-5" style={{ color: '#facc15' }} /> : <Moon className="h-5 w-5" style={{ color: 'var(--color-foreground)' }} />}
-              </button>
             <button
               onClick={toggleMobileMenu}
                 className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200 relative"

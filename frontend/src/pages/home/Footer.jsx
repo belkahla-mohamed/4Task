@@ -3,6 +3,7 @@
 import { Link } from "react-router-dom"
 import { useTranslation } from "@/components/translation-provider"
 import { CheckCircle, Twitter, Github, Mail, ArrowUpRight, Heart } from "lucide-react"
+import { useState } from "react"
 
 // Custom Button component for social icons
 const SocialButton = ({ children, href, className = "", ...props }) => {
@@ -19,12 +20,23 @@ const SocialButton = ({ children, href, className = "", ...props }) => {
 
 // Custom Link component with modern hover effects
 const FooterLink = ({ to, children, className = "", external = false }) => {
+  const [hovered, setHovered] = useState(false)
   const baseClasses =
-    "group inline-flex items-center text-gray-600 hover:text-blue-600 transition-all duration-300 font-medium"
+    "group inline-flex items-center text-gray-600 transition-all duration-300 font-medium"
 
   if (external) {
     return (
-      <a href={to} className={`${baseClasses} ${className}`} target="_blank" rel="noopener noreferrer">
+      <a href={to} className={`${baseClasses} ${className}`}
+        style={{
+          color: hovered ? (document.documentElement.classList.contains('dark') ? '#fff' : '#000') : undefined,
+          background: hovered && document.documentElement.classList.contains('dark') ? 'var(--color-card)' : undefined,
+          borderRadius: hovered ? '0.5rem' : undefined,
+          padding: hovered ? '0.25rem 0.5rem' : undefined,
+          transition: 'background 0.2s, color 0.2s',
+        }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        target="_blank" rel="noopener noreferrer">
         <span className="group-hover:translate-x-1 transition-transform duration-200">{children}</span>
         <ArrowUpRight className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100 transform translate-y-1 group-hover:translate-y-0 transition-all duration-200" />
       </a>
@@ -32,7 +44,17 @@ const FooterLink = ({ to, children, className = "", external = false }) => {
   }
 
   return (
-    <Link to={to} className={`${baseClasses} ${className}`}>
+    <Link to={to} className={`${baseClasses} ${className}`}
+      style={{
+        color: hovered ? (document.documentElement.classList.contains('dark') ? '#fff' : '#000') : undefined,
+        background: hovered && document.documentElement.classList.contains('dark') ? 'var(--color-card)' : undefined,
+        borderRadius: hovered ? '0.5rem' : undefined,
+        padding: hovered ? '0.25rem 0.5rem' : undefined,
+        transition: 'background 0.2s, color 0.2s',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <span className="group-hover:translate-x-1 transition-transform duration-200">{children}</span>
       <ArrowUpRight className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100 transform translate-y-1 group-hover:translate-y-0 transition-all duration-200" />
     </Link>

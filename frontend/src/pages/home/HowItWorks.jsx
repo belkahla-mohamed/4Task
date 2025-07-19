@@ -8,20 +8,14 @@ import { useEffect, useState } from "react"
 export default function HowItWorks() {
   const { t, isRTL } = useTranslation()
   const [isVisible, setIsVisible] = useState(false)
-  const [mood, setMood] = useState(() => document.documentElement.classList.contains('dark') ? 'dark' : 'light')
+  // Removed dark mode support
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100)
     return () => clearTimeout(timer)
   }, [])
 
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setMood(document.documentElement.classList.contains('dark') ? 'dark' : 'light')
-    })
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
-  }, [])
+  // Removed dark mode observer
 
   const steps = [
     {
@@ -114,7 +108,6 @@ export default function HowItWorks() {
     <section
       id="how-it-works"
       className="py-20 bg-gradient-to-br from-background via-muted/10 to-background overflow-hidden relative"
-      data-mood={mood}
     >
       {/* Background decorative elements with step colors */}
       <div className="absolute inset-0 overflow-hidden">
@@ -141,15 +134,15 @@ export default function HowItWorks() {
           } ${isRTL ? "text-right" : "text-left"} md:text-center`}
         >
           <Badge
-            className={`bg-gradient-to-r from-emerald-500/10 via-blue-500/10 via-amber-500/10 to-purple-500/10 text-foreground border-border/20 mb-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 dark:bg-gradient-to-r dark:from-emerald-900/20 dark:via-blue-900/20 dark:via-amber-900/20 dark:to-purple-900/20 dark:text-gray-100 dark:border-gray-700`}
+            className={`bg-gradient-to-r from-emerald-500/10 via-blue-500/10 via-amber-500/10 to-purple-500/10 text-foreground border-border/20 mb-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
           >
             <Layers className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
             {t("howItWorks")}
           </Badge>
-          <h2 className="text-5xl font-bold text-foreground mb-6 bg-gradient-to-r from-emerald-600 via-blue-600 via-amber-600 to-purple-600 bg-clip-text text-transparent dark:from-emerald-400 dark:via-blue-400 dark:via-amber-400 dark:to-purple-400">
+          <h2 className="text-5xl font-bold text-foreground mb-6 bg-gradient-to-r from-emerald-600 via-blue-600 via-amber-600 to-purple-600 bg-clip-text text-transparent">
             {t("howItWorksTitle")}
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed dark:text-gray-300">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             {t("howItWorksDescription")}
           </p>
         </div>
@@ -166,8 +159,8 @@ export default function HowItWorks() {
                 ${isRTL ? "text-right" : "text-left"} md:text-center
               `}
               style={{
-                background: mood === 'dark' ? 'var(--color-card)' : mood === 'light' ? '#fff' : undefined,
-                color: mood === 'dark' ? 'var(--color-card-foreground)' : undefined,
+                background: '#fff',
+                color: undefined,
                 transitionDelay: isVisible ? step.delay.replace("delay-", "") + "ms" : "0ms",
               }}
             >
@@ -191,14 +184,14 @@ export default function HowItWorks() {
                     {step.icon}
                   </div>
                   <div
-                    className={`absolute -top-2 -right-2 rtl:-left-2 rtl:right-auto bg-gradient-to-br ${step.colors.accent} text-white text-sm font-bold w-10 h-10 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:-rotate-12 transition-all duration-300 border-2 border-background dark:border-gray-900`}
+                    className={`absolute -top-2 -right-2 rtl:-left-2 rtl:right-auto bg-gradient-to-br ${step.colors.accent} text-white text-sm font-bold w-10 h-10 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:-rotate-12 transition-all duration-300 border-2 border-background`}
                   >
                     {step.number}
                   </div>
                   {/* Connecting line with step color */}
                   {index < steps.length - 1 && (
                     <div
-                      className={`hidden lg:block absolute top-10 left-full w-full h-0.5 bg-gradient-to-r from-border to-transparent transform translate-x-4 ${step.colors.textHover} transition-colors duration-500 dark:from-gray-700`}
+                      className={`hidden lg:block absolute top-10 left-full w-full h-0.5 bg-gradient-to-r from-border to-transparent transform translate-x-4 ${step.colors.textHover} transition-colors duration-500`}
                     />
                   )}
                 </div>
@@ -206,12 +199,10 @@ export default function HowItWorks() {
                 <div className="space-y-4">
                   <h3
                     className={`text-xl font-bold text-foreground ${step.colors.textHover} transition-colors duration-300 group-hover:scale-105 transform origin-center`}
-                    style={{ color: mood === 'dark' ? 'var(--color-card-foreground)' : undefined }}
                   >
                     {step.title}
                   </h3>
                   <p className="text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300 leading-relaxed"
-                    style={{ color: mood === 'dark' ? 'var(--color-card-foreground)' : undefined }}
                   >
                     {step.description}
                   </p>
@@ -225,7 +216,7 @@ export default function HowItWorks() {
 
               {/* Glow effect with step colors */}
               <div
-                className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${step.colors.glow} opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl dark:opacity-20`}
+                className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${step.colors.glow} opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl`}
               />
             </div>
           ))}
@@ -233,12 +224,12 @@ export default function HowItWorks() {
 
         {/* Process flow visualization with color progression */}
         <div className="hidden lg:block mt-16 relative">
-          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500/20 via-blue-500/20 via-amber-500/20 to-purple-500/20 transform -translate-y-1/2 dark:from-gray-700 dark:via-gray-700 dark:to-gray-700" />
+          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500/20 via-blue-500/20 via-amber-500/20 to-purple-500/20 transform -translate-y-1/2" />
           <div className="flex justify-between items-center">
             {steps.map((step, index) => (
               <div
                 key={index}
-                className={`w-4 h-4 rounded-full ${step.colors.primary} transition-all duration-700 dark:opacity-70 ${
+                className={`w-4 h-4 rounded-full ${step.colors.primary} transition-all duration-700 ${
                   isVisible ? "scale-100 opacity-100" : "scale-0 opacity-0"
                 }`}
                 style={{

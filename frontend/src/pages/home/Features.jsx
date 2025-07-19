@@ -9,7 +9,7 @@ import { useEffect, useState } from "react"
 export default function Features() {
   const { t, isRTL } = useTranslation()
   const [isVisible, setIsVisible] = useState(false)
-  const [mood, setMood] = useState(() => document.documentElement.classList.contains('dark') ? 'dark' : 'light')
+  // Removed dark mode support
   const [hoveredIndex, setHoveredIndex] = useState(null)
 
   useEffect(() => {
@@ -17,13 +17,7 @@ export default function Features() {
     return () => clearTimeout(timer)
   }, [])
 
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setMood(document.documentElement.classList.contains('dark') ? 'dark' : 'light')
-    })
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
-  }, [])
+  // Removed dark mode observer
 
   const features = [
     {
@@ -149,7 +143,7 @@ export default function Features() {
   ]
 
   return (
-    <section id="features" className="py-20 bg-gradient-to-br from-muted/20 via-muted/30 to-muted/40 overflow-hidden" data-mood={mood}>
+    <section id="features" className="py-20 bg-gradient-to-br from-muted/20 via-muted/30 to-muted/40 overflow-hidden">
       {/* Background decorative elements with feature colors */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-32 h-32 rounded-full blur-3xl animate-pulse" style={{ background: 'rgba(var(--color-accent-rgb, 239,68,68), 0.05)' }} />
@@ -183,15 +177,15 @@ export default function Features() {
           } ${isRTL ? "text-right" : "text-left"} md:text-center`}
         >
           <Badge
-            className={`bg-gradient-to-r from-red-500/10 via-blue-500/10 via-pink-500/10 via-emerald-500/10 via-amber-500/10 to-indigo-500/10 text-foreground border-border/20 mb-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 dark:bg-gradient-to-r dark:from-red-900/20 dark:via-blue-900/20 dark:via-pink-900/20 dark:via-emerald-900/20 dark:via-amber-900/20 dark:to-indigo-900/20 dark:text-gray-100 dark:border-gray-700`}
+            className={`bg-gradient-to-r from-red-500/10 via-blue-500/10 via-pink-500/10 via-emerald-500/10 via-amber-500/10 to-indigo-500/10 text-foreground border-border/20 mb-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
           >
             <BarChart3 className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
             {t("features")}
           </Badge>
-          <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-red-600 via-blue-600 via-pink-600 via-emerald-600 via-amber-600 to-indigo-600 bg-clip-text text-transparent dark:from-red-400 dark:via-blue-400 dark:via-pink-400 dark:via-emerald-400 dark:via-amber-400 dark:to-indigo-400">
+          <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-red-600 via-blue-600 via-pink-600 via-emerald-600 via-amber-600 to-indigo-600 bg-clip-text text-transparent">
             {t("featuresTitle")}
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed dark:text-gray-300">{t("featuresDescription")}</p>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">{t("featuresDescription")}</p>
         </div>
 
         {/* Features grid with color-coded animations */}
@@ -210,14 +204,14 @@ export default function Features() {
                 }
               `}
               style={{
-                background: mood === 'dark' ? 'var(--color-card)' : mood === 'light' ? '#fff' : undefined,
-                color: mood === 'dark' ? 'var(--color-card-foreground)' : mood === 'light' ? '#111827' : undefined,
+                background: '#fff',
+                color: '#111827',
                 transitionDelay: isVisible ? feature.delay.replace("delay-", "") + "ms" : "0ms",
               }}
             >
               {/* Animated background gradient with feature colors */}
               <div
-                className={`absolute inset-0 bg-gradient-to-br ${feature.colors.glow} opacity-0 group-hover:opacity-100 transition-opacity duration-500 dark:opacity-20`}
+                className={`absolute inset-0 bg-gradient-to-br ${feature.colors.glow} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
               />
               {/* Floating particles with feature colors */}
               <div
@@ -227,7 +221,7 @@ export default function Features() {
                 className={`absolute bottom-6 left-6 w-1 h-1 ${feature.colors.particle} rounded-full animate-ping opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
               />
               <CardHeader className={`relative z-10 pb-4 ${isRTL ? "text-right" : "text-left"}`}
-                style={{ color: mood === 'dark' ? 'var(--color-card-foreground)' : mood === 'light' ? '#111827' : undefined }}>
+                style={{ color: '#111827' }}>
                 <div
                   className={`
                     ${feature.colors.primary} ${feature.colors.primaryHover} text-white mb-6 p-4 rounded-2xl backdrop-blur-sm
@@ -239,22 +233,18 @@ export default function Features() {
                 </div>
                 <CardTitle
                   className={`text-xl font-bold text-card-foreground ${feature.colors.textHover} transition-colors duration-300`}
-                  style={{ color: mood === 'dark' ? 'var(--color-card-foreground)' : mood === 'light' ? '#111827' : undefined }}
+                  style={{ color: '#111827' }}
                 >
                   {feature.title}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="relative z-10 pt-0" style={{ color: mood === 'dark' ? 'var(--color-card-foreground)' : mood === 'light' ? '#111827' : undefined }}>
+              <CardContent className="relative z-10 pt-0" style={{ color: '#111827' }}>
                 <p
                   className="text-muted-foreground leading-relaxed transition-colors duration-300"
                   style={{
                     color:
                       hoveredIndex === index
-                        ? mood === 'dark'
-                          ? '#fff'
-                          : '#000'
-                        : mood === 'dark'
-                        ? 'var(--color-card-foreground)'
+                        ? '#fff'
                         : '#111827',
                   }}
                   onMouseEnter={() => setHoveredIndex(index)}
@@ -282,7 +272,7 @@ export default function Features() {
           {features.map((feature, index) => (
             <div
               key={index}
-              className={`w-3 h-3 rounded-full ${feature.colors.primary} transition-all duration-700 dark:opacity-70 ${
+              className={`w-3 h-3 rounded-full ${feature.colors.primary} transition-all duration-700 ${
                 isVisible ? "scale-100 opacity-100" : "scale-0 opacity-0"
               }`}
               style={{

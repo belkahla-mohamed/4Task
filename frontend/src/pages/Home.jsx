@@ -25,8 +25,8 @@ export default function Home() {
       <Stats />
       <Testimonials />
       <FAQ />
-      <Newsletter />
       <Contact />
+      <Newsletter />
       <CTA />
       <Footer />
     </div>

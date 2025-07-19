@@ -9,11 +9,15 @@ import { Shield } from "lucide-react"
 export default function FAQ() {
   const { t, isRTL } = useTranslation()
   const [isVisible, setIsVisible] = useState(false)
+  const [hoveredIndex, setHoveredIndex] = useState(null)
+  // Removed dark mode support
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100)
     return () => clearTimeout(timer)
   }, [])
+
+  // Removed dark mode observer
 
   const faqs = [
     {
@@ -124,7 +128,9 @@ export default function FAQ() {
   ]
 
   return (
-    <section className="py-20 bg-white">
+    <section
+      className={`py-20 bg-white transition-colors duration-500`}
+    >
       <div className="container mx-auto px-4">
         {/* Header with fly-in animation */}
         <div
@@ -203,12 +209,33 @@ export default function FAQ() {
 
                   <AccordionContent
                     className={`
-                      text-muted-foreground group-hover:text-foreground/80 
+                      text-muted-foreground
+                      group-hover:text-foreground/80
                       transition-colors duration-300 pb-6 text-base leading-relaxed
                       ${isRTL ? "text-right" : "text-left"}
                     `}
                   >
-                    <div className="pl-12 rtl:pr-12 rtl:pl-0">{faq.answer}</div>
+                    <div
+                      className="pl-12 rtl:pr-12 rtl:pl-0"
+                      style={{
+                        color:
+                          hoveredIndex === index
+                            ? document.documentElement.classList.contains('dark')
+                              ? '#fff'
+                              : '#000'
+                            : undefined,
+                        background:
+                          hoveredIndex === index && document.documentElement.classList.contains('dark')
+                            ? 'var(--color-card)' : undefined,
+                        borderRadius: hoveredIndex === index ? '0.5rem' : undefined,
+                        padding: hoveredIndex === index ? '0.5rem' : undefined,
+                        transition: 'background 0.2s, color 0.2s',
+                      }}
+                      onMouseEnter={() => setHoveredIndex(index)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                    >
+                      {faq.answer}
+                    </div>
                   </AccordionContent>
                 </div>
 

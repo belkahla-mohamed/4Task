@@ -9,11 +9,15 @@ import { Star, Users } from "lucide-react"
 export default function Testimonials() {
   const { t, isRTL } = useTranslation()
   const [isVisible, setIsVisible] = useState(false)
+  const [hoveredIndex, setHoveredIndex] = useState(null)
+  // Removed dark mode support
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100)
     return () => clearTimeout(timer)
   }, [])
+
+  // Removed dark mode observer
 
   const testimonials = [
     {
@@ -88,7 +92,10 @@ export default function Testimonials() {
   ]
 
   return (
-    <section id="testimonials" className="py-20 bg-white">
+    <section
+      id="testimonials"
+      className={`py-20 bg-white transition-colors duration-500`}
+    >
       <div className="container mx-auto px-4">
         {/* Header with fly-in animation */}
         <div
@@ -165,7 +172,23 @@ export default function Testimonials() {
                   >
                     "
                   </div>
-                  <p className="text-muted-foreground italic group-hover:text-foreground transition-colors duration-300 leading-relaxed text-lg relative z-10">
+                  <p
+                    className="text-muted-foreground italic transition-colors duration-300 leading-relaxed text-lg relative z-10"
+                    style={{
+                      color:
+                        hoveredIndex === index
+                          ? '#000' // Always light mode for text
+                          : undefined,
+                      background:
+                        hoveredIndex === index && document.documentElement.classList.contains('dark')
+                          ? 'var(--color-card)' : undefined,
+                      borderRadius: hoveredIndex === index ? '0.5rem' : undefined,
+                      padding: hoveredIndex === index ? '0.5rem' : undefined,
+                      transition: 'background 0.2s, color 0.2s',
+                    }}
+                    onMouseEnter={() => setHoveredIndex(index)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                  >
                     {testimonial.content}
                   </p>
                   <div
