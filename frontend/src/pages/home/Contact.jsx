@@ -7,6 +7,7 @@ export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" })
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [result, setResult] = useState("")
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100)
@@ -17,14 +18,34 @@ export default function Contact() {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-      setSubmitted(true)
-      setForm({ name: "", email: "", subject: "", message: "" })
-    }, 1200)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setResult("Sending...");
+    const formData = new FormData();
+    formData.append("access_key", "73d9e5bc-dd4a-4ca6-a4eb-2b9115888b34");
+    formData.append("name", form.name);
+    formData.append("email", form.email);
+    formData.append("subject", form.subject);
+    formData.append("message", form.message);
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+      });
+      const data = await response.json();
+      if (data.success) {
+        setResult("Form Submitted Successfully");
+        setSubmitted(true);
+        setForm({ name: "", email: "", subject: "", message: "" });
+      } else {
+        setResult(data.message || "Submission failed");
+      }
+    } catch (err) {
+      setResult("Submission failed. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -366,6 +387,9 @@ export default function Contact() {
                         </>
                       )}
                     </button>
+                    {result && (
+                      <div className="text-center mt-4 text-base text-blue-300">{result}</div>
+                    )}
                   </form>
                 )}
 
