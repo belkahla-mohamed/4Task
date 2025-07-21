@@ -11,6 +11,7 @@ const TaskModal = ({ isOpen, onClose, task, onSave, categories }) => {
     priority: "medium",
   })
 
+
   useEffect(() => {
     if (task) {
       setFormData(task)

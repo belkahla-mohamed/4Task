@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Dashboard from './pages/dashboard/page'
+
 import { TranslationProvider } from '@/components/translation-provider'
 import "./App.css"
 import Home from './pages/Home'
@@ -7,6 +7,8 @@ import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
 import Profile from './pages/Auth/Profile'
 import Achievements from './pages/Achievement'
+import Dashboard from './pages/dashboard'
+import Chat from './pages/ai'
 
 function App() {
   return (
@@ -19,6 +21,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/achievement" element={<Achievements />} />
+          <Route path="/Chat" element={<Chat />} />
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
       </BrowserRouter>

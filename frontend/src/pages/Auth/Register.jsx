@@ -336,7 +336,7 @@ export default function Register() {
 
     try {
       // Strapi register API call
-      const response = await fetch('https://fresh-egg-85913f543b.strapiapp.com/api/auth/local/register', {
+      const response = await fetch('https://necessary-laughter-8861a20860.strapiapp.com/api/auth/local/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

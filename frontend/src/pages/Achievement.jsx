@@ -2,12 +2,20 @@
 
 import { useState, useEffect } from "react"
 import { Trophy, Zap, Award, Star, Target, Crown } from "lucide-react"
+import { fetchAchievements, fetchUserTasks, fetchClaimedAchievements, claimAchievement, fetchUserProgress } from "../lib/api";
 
 export default function Achievements() {
   const [achievements, setAchievements] = useState([])
+  const [tasks, setTasks] = useState([])
+  const [userAchievements, setUserAchievements] = useState([])
+  const [userProgress, setUserProgress] = useState({ xp: 0, level: 1, streak: 0 })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [isVisible, setIsVisible] = useState(false)
+  const [claiming, setClaiming] = useState(null)
+
+  // TODO: Replace with real user ID from auth context or localStorage
+  const userId = 1
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100)
@@ -15,38 +23,27 @@ export default function Achievements() {
   }, [])
 
   useEffect(() => {
-    async function fetchAchievements() {
+    async function fetchData() {
       setLoading(true)
       setError(null)
       try {
-        const res = await fetch("https://fresh-egg-85913f543b.strapiapp.com/api/achievements?populate=icon")
-        const data = await res.json()
-        if (!data.data) throw new Error("No achievements found")
-
-        // Map to flat array of achievements
-        const achievementsList = data.data.map((item) => {
-          const attr = item || {}
-          return {
-            id: item.id,
-            title: attr.title,
-            description: attr.description,
-            xp: attr.xp,
-            iconUrl: attr.icon?.data?.attributes?.url || null,
-            createdAt: attr.createdAt,
-            updatedAt: attr.updatedAt,
-            publishedAt: attr.publishedAt,
-            documentId: attr.documentId,
-          }
-        })
-        setAchievements(achievementsList)
+        const [achievementsData, tasksData, claimedData, progressData] = await Promise.all([
+          fetchAchievements(),
+          fetchUserTasks(userId),
+          fetchClaimedAchievements(userId),
+          fetchUserProgress(userId),
+        ])
+        setAchievements(achievementsData)
+        setTasks(tasksData)
+        setUserAchievements(claimedData)
+        setUserProgress(progressData)
       } catch (err) {
         setError(err.message)
       } finally {
         setLoading(false)
       }
     }
-
-    fetchAchievements()
+    fetchData()
   }, [])
 
   // Achievement rarity colors (you can add rarity logic based on XP or other criteria)
@@ -61,6 +58,62 @@ export default function Achievements() {
   const getRandomIcon = () => {
     const icons = [Trophy, Award, Star, Target, Crown, Zap]
     return icons[Math.floor(Math.random() * icons.length)]
+  }
+
+  // Expanded requirement logic for all provided keys
+  const getAchievementState = (achievement) => {
+    const completedTasks = tasks.filter(task => task.statusTask === "done" || task.status === "done");
+    const hasClaimed = userAchievements.includes(achievement.id);
+    // Use userProgress for XP, streak, etc.
+    if (hasClaimed) return "unlocked";
+    if (achievement.requirement) {
+      if (achievement.requirement === "complete_1_task" && completedTasks.length >= 1) {
+        return "claimable";
+      }
+      if (achievement.requirement === "complete_5_tasks" && completedTasks.length >= 5) {
+        return "claimable";
+      }
+      if (achievement.requirement === "complete_20_tasks" && completedTasks.length >= 20) {
+        return "claimable";
+      }
+      if (achievement.requirement === "complete_100_tasks" && completedTasks.length >= 100) {
+        return "claimable";
+      }
+      if (achievement.requirement === "complete_daily_task_3_times" && userProgress.streak >= 3) {
+        return "claimable";
+      }
+      if (achievement.requirement === "complete_daily_task_7_times" && userProgress.streak >= 7) {
+        return "claimable";
+      }
+      if (achievement.requirement === "use_reminders_10_times" && userProgress.reminderUsageCount >= 10) {
+        return "claimable";
+      }
+      if (achievement.requirement === "earn_100_xp_total" && userProgress.xp >= 100) {
+        return "claimable";
+      }
+      if (achievement.requirement === "earn_500_xp_total" && userProgress.xp >= 500) {
+        return "claimable";
+      }
+      if (achievement.requirement === "claim_1_achievement" && userAchievements.length >= 1) {
+        return "claimable";
+      }
+      // TODO: try_3_features, etc.
+    }
+    return "locked";
+  }
+
+  const handleClaim = async (achievement) => {
+    setClaiming(achievement.id)
+    try {
+      await claimAchievement(userId, achievement.id)
+      // Refresh claimed achievements
+      const claimedData = await fetchClaimedAchievements(userId)
+      setUserAchievements(claimedData)
+    } catch (err) {
+      alert("Failed to claim achievement: " + err.message)
+    } finally {
+      setClaiming(null)
+    }
   }
 
   if (loading) {
@@ -255,6 +308,17 @@ export default function Achievements() {
             </div>
           </div>
 
+          {/* Add XP bar above achievements grid: */}
+          <div className="w-full max-w-xl mx-auto mb-8">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-semibold text-slate-200">XP</span>
+              <span className="text-xs font-semibold text-slate-200">{userProgress.xp} XP</span>
+            </div>
+            <div className="w-full bg-slate-700 rounded-full h-3">
+              <div className="bg-gradient-to-r from-emerald-400 to-blue-500 h-3 rounded-full" style={{ width: `${Math.min(userProgress.xp, 100)}%` }}></div>
+            </div>
+          </div>
+
           {/* Achievements Grid */}
           <div
             className={`transition-all duration-1000 ease-out delay-400 ${
@@ -265,14 +329,15 @@ export default function Achievements() {
               {achievements.map((achievement, index) => {
                 const rarity = getRarityStyle(achievement.xp || 0)
                 const IconComponent = getRandomIcon()
-
+                const state = getAchievementState(achievement)
                 return (
                   <div
                     key={achievement.id}
-                    className="relative bg-gradient-to-br from-slate-800/50 to-slate-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 backdrop-blur-sm border border-slate-600/30 card-floating fade-in-up"
+                    className={`relative bg-gradient-to-br from-slate-800/50 to-slate-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 backdrop-blur-sm border border-slate-600/30 card-floating fade-in-up ${state === "locked" ? "opacity-50 grayscale" : ""}`}
                     style={{
                       animationDelay: `${index * 0.1}s`,
                       borderColor: `${rarity.color}40`,
+                      pointerEvents: state === "locked" ? "none" : "auto",
                     }}
                   >
                     {/* Rarity indicator */}
@@ -324,12 +389,21 @@ export default function Achievements() {
                           </div>
                           <span className="text-sm font-semibold text-orange-400">+{achievement.xp || 0} XP</span>
                         </div>
-
-                        {/* Date */}
-                        {achievement.createdAt && (
-                          <span className="text-xs text-slate-400">
-                            {new Date(achievement.createdAt).toLocaleDateString()}
-                          </span>
+                        {/* Date or claim button */}
+                        {state === "unlocked" && (
+                          <span className="text-xs text-emerald-400 font-bold">Claimed</span>
+                        )}
+                        {state === "claimable" && (
+                          <button
+                            className="text-xs px-3 py-1 rounded bg-emerald-500 text-white font-bold shadow hover:bg-emerald-600 transition disabled:opacity-50"
+                            disabled={claiming === achievement.id}
+                            onClick={() => handleClaim(achievement)}
+                          >
+                            {claiming === achievement.id ? "Claiming..." : "Claim"}
+                          </button>
+                        )}
+                        {state === "locked" && (
+                          <span className="text-xs text-slate-400 font-bold flex items-center gap-1"><span role="img" aria-label="locked">🔒</span> Locked</span>
                         )}
                       </div>
                     </div>

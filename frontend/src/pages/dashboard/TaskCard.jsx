@@ -38,7 +38,7 @@ const TaskCard = ({ task, onEdit, onDelete, onStatusChange, dragHandleProps }) =
 
   return (
     <div
-      className={`group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 transition-all duration-200 hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-600 ${
+      className={`group bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 cursor-default p-6 transition-all duration-200 hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-600 ${
         task.status === "done" ? "opacity-75" : ""
       }`}
       onMouseEnter={() => setIsHovered(true)}
@@ -49,7 +49,7 @@ const TaskCard = ({ task, onEdit, onDelete, onStatusChange, dragHandleProps }) =
         <div className="flex items-start space-x-3 flex-1">
           <button
             onClick={() => onStatusChange(task.id, task.status)}
-            className="mt-1 transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+            className="mt-1 transition-transform duration-200 cursor-pointer "
           >
             {getStatusIcon(task.status)}
           </button>
@@ -100,14 +100,14 @@ const TaskCard = ({ task, onEdit, onDelete, onStatusChange, dragHandleProps }) =
         >
           <button
             onClick={(e) => { e.stopPropagation(); onEdit(task); }}
-            className="p-2 rounded-lg text-blue-600 hover:bg-blue-900/20 transition-colors duration-200 "
+            className="p-2 rounded-lg text-blue-600 cursor-pointer hover:bg-blue-900/20 transition-colors duration-200 "
             title="Edit task"
           >
             <Edit3 className="h-4 w-4" />
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
-            className="p-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            onClick={(e) => { e.stopPropagation(); onDelete(task.documentId); }}
+            className="p-2 rounded-lg text-red-600 cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 "
             title="Delete task"
           >
             <Trash2 className="h-4 w-4" />

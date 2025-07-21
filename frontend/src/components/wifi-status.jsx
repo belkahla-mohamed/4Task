@@ -49,10 +49,10 @@ export function WifiStatus() {
         <button
           onClick={handleSync}
           disabled={!isOnline || syncStatus === 'syncing'}
-          className={`p-2 rounded-lg transition-colors ${
+          className={`p-2 rounded-lg transition-colors cursor-pointer ${
             syncStatus === 'syncing' 
               ? 'opacity-50 cursor-not-allowed' 
-                : 'hover:bg-gray-100'
+                : 'hover:bg-gray-700'
           }`}
           title={isOnline ? 'Sync tasks' : 'Offline'}
         >

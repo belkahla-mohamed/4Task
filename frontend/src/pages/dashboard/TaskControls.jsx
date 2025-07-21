@@ -16,7 +16,7 @@ const TaskControls = ({ searchTerm, setSearchTerm, showFilters, setShowFilters, 
     {/* Filter Toggle */}
     <button
       onClick={() => setShowFilters(!showFilters)}
-      className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+      className="flex items-center space-x-2 cursor-pointer px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
     >
       <Filter className="h-4 w-4" />
       <span>Filters</span>
@@ -25,7 +25,7 @@ const TaskControls = ({ searchTerm, setSearchTerm, showFilters, setShowFilters, 
     {/* Add Task Button */}
     <button
       onClick={handleAddTask}
-      className="flex items-center space-x-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      className="flex items-center cursor-pointer space-x-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
     >
       <Plus className="h-4 w-4" />
       <span>Add Task</span>

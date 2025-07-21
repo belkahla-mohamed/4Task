@@ -76,7 +76,7 @@ const MobileMenu = ({ isOpen, onClose, isLoggedIn, user, onLogin, onLogout }) =>
                 <div className="flex items-center justify-center p-2 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 relative overflow-hidden">
                   
                   <img
-                    src="https://fresh-egg-85913f543b.media.strapiapp.com/logo_4task_a2d3384540.png"
+                    src="https://necessary-laughter-8861a20860.media.strapiapp.com/logo_8d6d41ebb3.png"
                     alt="4Task Logo"
                     className="h-8 w-8  object-contain relative z-10 drop-shadow-md filter brightness-110"
                     style={{ filter: "drop-shadow(0 1px 4px rgba(255,255,255,0.3))" }}
@@ -162,7 +162,7 @@ const useAuth = () => {
     }
 
     // Fetch user from Strapi
-    fetch(`https://fresh-egg-85913f543b.strapiapp.com/api/users/${userId}`, {
+    fetch(`https://necessary-laughter-8861a20860.strapiapp.com/api/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -247,7 +247,7 @@ export default function Header() {
 
                   {/* Logo image */}
                   <img
-                    src="https://fresh-egg-85913f543b.media.strapiapp.com/logo_4task_a2d3384540.png"
+                    src="https://necessary-laughter-8861a20860.media.strapiapp.com/logo_8d6d41ebb3.png"
                     alt="4Task Logo"
                     className="h-8 w-8 lg:h-12 lg:w-12 object-contain relative z-10 "
                     style={{

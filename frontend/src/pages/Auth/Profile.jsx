@@ -21,35 +21,35 @@ import {
 import { jwtDecode } from "jwt-decode"
 
 // Recent achievements
-const recentAchievements = [
-  {
-    id: "streak_7",
-    name: "Week Warrior",
-    description: "Maintain a 7-day streak",
-    icon: Calendar,
-    rarity: "uncommon",
-    unlockedAt: "2024-01-10",
-    xpReward: 75,
-  },
-  {
-    id: "task_master_10",
-    name: "Task Master",
-    description: "Complete 10 tasks",
-    icon: Trophy,
-    rarity: "uncommon",
-    unlockedAt: "2024-01-08",
-    xpReward: 50,
-  },
-  {
-    id: "early_bird",
-    name: "Early Bird",
-    description: "Complete a task before 8 AM",
-    icon: Clock,
-    rarity: "uncommon",
-    unlockedAt: "2024-01-05",
-    xpReward: 30,
-  },
-]
+// const recentAchievements = [
+//   {
+//     id: "streak_7",
+//     name: "Week Warrior",
+//     description: "Maintain a 7-day streak",
+//     icon: Calendar,
+//     rarity: "uncommon",
+//     unlockedAt: "2024-01-10",
+//     xpReward: 75,
+//   },
+//   {
+//     id: "task_master_10",
+//     name: "Task Master",
+//     description: "Complete 10 tasks",
+//     icon: Trophy,
+//     rarity: "uncommon",
+//     unlockedAt: "2024-01-08",
+//     xpReward: 50,
+//   },
+//   {
+//     id: "early_bird",
+//     name: "Early Bird",
+//     description: "Complete a task before 8 AM",
+//     icon: Clock,
+//     rarity: "uncommon",
+//     unlockedAt: "2024-01-05",
+//     xpReward: 30,
+//   },
+// ]
 
 // Weekly activity data
 const weeklyActivity = [
@@ -116,33 +116,33 @@ const StatCard = ({ icon: Icon, title, value, subtitle, color = "#1E90FF", trend
 }
 
 // Achievement Badge Component
-const AchievementBadge = ({ achievement }) => {
-  const rarity = rarityStyles[achievement.rarity]
-  return (
-    <div
-      className="flex items-center space-x-3 p-4 rounded-xl border transition-all duration-300 hover:scale-105 bg-slate-800/50 backdrop-blur-sm"
-      style={{
-        borderColor: rarity.color,
-      }}
-    >
-      <div
-        className="p-2 rounded-lg border"
-        style={{
-          backgroundColor: `${rarity.color}20`,
-          color: rarity.color,
-          borderColor: `${rarity.color}30`,
-        }}
-      >
-        <achievement.icon className="h-5 w-5" />
-      </div>
-      <div className="flex-1">
-        <h4 className="font-semibold text-sm text-white">{achievement.name}</h4>
-        <p className="text-xs text-slate-400">{new Date(achievement.unlockedAt).toLocaleDateString()}</p>
-      </div>
-      <div className="text-xs font-medium text-orange-400">+{achievement.xpReward} XP</div>
-    </div>
-  )
-}
+// const AchievementBadge = ({ achievement }) => {
+//   const rarity = rarityStyles[achievement.rarity]
+//   return (
+//     <div
+//       className="flex items-center space-x-3 p-4 rounded-xl border transition-all duration-300 hover:scale-105 bg-slate-800/50 backdrop-blur-sm"
+//       style={{
+//         borderColor: rarity.color,
+//       }}
+//     >
+//       <div
+//         className="p-2 rounded-lg border"
+//         style={{
+//           backgroundColor: `${rarity.color}20`,
+//           color: rarity.color,
+//           borderColor: `${rarity.color}30`,
+//         }}
+//       >
+//         <achievement.icon className="h-5 w-5" />
+//       </div>
+//       <div className="flex-1">
+//         <h4 className="font-semibold text-sm text-white">{achievement.name}</h4>
+//         <p className="text-xs text-slate-400">{new Date(achievement.unlockedAt).toLocaleDateString()}</p>
+//       </div>
+//       <div className="text-xs font-medium text-orange-400">+{achievement.xpReward} XP</div>
+//     </div>
+//   )
+// }
 
 // Weekly Chart Component
 const WeeklyChart = ({ data }) => {
@@ -452,7 +452,7 @@ export default function Profile() {
     }
 
     // Fetch user info
-    fetch(`https://fresh-egg-85913f543b.strapiapp.com/api/users/${userId}`, {
+    fetch(`https://necessary-laughter-8861a20860.strapiapp.com/api/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -468,7 +468,7 @@ export default function Profile() {
       })
 
     // Fetch user progress
-    fetch(`https://fresh-egg-85913f543b.strapiapp.com/api/user-progresses?filters[user][id][$eq]=${userId}`)
+    fetch(`https://necessary-laughter-8861a20860.strapiapp.com/api/user-progresses?filters[user][id][$eq]=${userId}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.data && data.data.length > 0) {
@@ -780,7 +780,7 @@ export default function Profile() {
             </div>
 
             {/* Recent Achievements */}
-            <div className="relative bg-gradient-to-br from-slate-800/50 to-slate-700/50 rounded-xl p-4 sm:p-6 shadow-2xl backdrop-blur-sm border border-slate-600/30">
+            {/* <div className="relative bg-gradient-to-br from-slate-800/50 to-slate-700/50 rounded-xl p-4 sm:p-6 shadow-2xl backdrop-blur-sm border border-slate-600/30">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-base sm:text-lg font-semibold text-white">Recent Achievements</h3>
                 <Award className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400" />
@@ -790,7 +790,7 @@ export default function Profile() {
                   <AchievementBadge key={achievement.id} achievement={achievement} />
                 ))}
               </div>
-            </div>
+            </div> */}
 
             {/* Quick Stats */}
             <div className="relative bg-gradient-to-br from-slate-800/50 to-slate-700/50 rounded-xl p-4 sm:p-6 shadow-2xl backdrop-blur-sm border border-slate-600/30">
